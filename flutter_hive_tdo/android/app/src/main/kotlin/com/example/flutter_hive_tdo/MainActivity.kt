@@ -1,4 +1,4 @@
-package com.example.flutter_hive_tdo
+package com.digitalhelp.quickdoapp
 
 import io.flutter.embedding.android.FlutterActivity
 

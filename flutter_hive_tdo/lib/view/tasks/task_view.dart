@@ -1,7 +1,8 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+// import 'package:flutter_datetime_picker/flutter_datetime_picker.dart'
+//     as datetime_picker;
 import 'package:intl/intl.dart';
 
 ///
@@ -32,6 +33,7 @@ class _TaskViewState extends State<TaskView> {
   var title;
   var subtitle;
   DateTime? time;
+  TimeOfDay time2 = TimeOfDay.now(); // Default time value
   DateTime? date;
 
   /// Show Selected Time As String Format
@@ -140,28 +142,33 @@ class _TaskViewState extends State<TaskView> {
     var textTheme = Theme.of(context).textTheme;
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: const MyAppBar(),
-        body: SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: Center(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  /// new / update Task Text
-                  _buildTopText(textTheme),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: const MyAppBar(),
+          body: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Center(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    /// new / update Task Text
+                    _buildTopText(textTheme),
 
-                  /// Middle Two TextFileds, Time And Date Selection Box
-                  _buildMiddleTextFieldsANDTimeAndDateSelection(
-                      context, textTheme),
+                    /// Middle Two TextFileds, Time And Date Selection Box
+                    _buildMiddleTextFieldsANDTimeAndDateSelection(
+                        context, textTheme),
 
-                  /// All Bottom Buttons
-                  _buildBottomButtons(context),
-                ],
+                    /// All Bottom Buttons
+                    _buildBottomButtons(context),
+                    const SizedBox(
+                      height: 50,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -173,7 +180,7 @@ class _TaskViewState extends State<TaskView> {
   /// All Bottom Buttons
   Padding _buildBottomButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 40),
       child: Row(
         mainAxisAlignment: isTaskAlreadyExistBool()
             ? MainAxisAlignment.center
@@ -201,8 +208,8 @@ class _TaskViewState extends State<TaskView> {
                       Navigator.pop(context);
                     },
                     color: Colors.white,
-                    child: Row(
-                      children: const [
+                    child: const Row(
+                      children: [
                         Icon(
                           Icons.close,
                           color: MyColors.primaryColor,
@@ -258,8 +265,7 @@ class _TaskViewState extends State<TaskView> {
           /// Title of TextFiled
           Padding(
             padding: const EdgeInsets.only(left: 30),
-            child: Text(MyString.titleOfTitleTextField,
-                style: textTheme.headline4),
+            child: Text('Title of Task', style: textTheme.headlineMedium),
           ),
 
           /// Title TextField
@@ -269,8 +275,8 @@ class _TaskViewState extends State<TaskView> {
             child: ListTile(
               title: TextFormField(
                 controller: widget.taskControllerForTitle,
-                maxLines: 6,
-                cursorHeight: 60,
+                // maxLines: 6,
+                // cursorHeight: 60,
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   enabledBorder: UnderlineInputBorder(
@@ -304,10 +310,11 @@ class _TaskViewState extends State<TaskView> {
                 controller: widget.taskControllerForSubtitle,
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.bookmark_border, color: Colors.grey),
+                  // prefixIcon:
+                  //     const Icon(Icons.bookmark_border, color: Colors.grey),
                   border: InputBorder.none,
                   counter: Container(),
-                  hintText: MyString.addNote,
+                  hintText: 'Description',
                 ),
                 onFieldSubmitted: (value) {
                   subtitle = value;
@@ -318,24 +325,26 @@ class _TaskViewState extends State<TaskView> {
               ),
             ),
           ),
+          const Divider(),
 
           /// Time Picker
           GestureDetector(
-            onTap: () {
-              DatePicker.showTimePicker(context,
-                  showTitleActions: true,
-                  showSecondsColumn: false,
-                  onChanged: (_) {}, onConfirm: (selectedTime) {
-                setState(() {
-                  if (widget.task?.createdAtTime == null) {
-                    time = selectedTime;
-                  } else {
-                    widget.task!.createdAtTime = selectedTime;
-                  }
-                });
+            onTap: () async {
+              TimeOfDay? selectedTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
+              );
+              // print("timeeeeeeee $selectedTime");
 
-                FocusManager.instance.primaryFocus?.unfocus();
-              }, currentTime: showTimeAsDateTime(time));
+              if (selectedTime != null) {
+                DateTime now = DateTime.now();
+                DateTime selectedDateTime = DateTime(now.year, now.month,
+                    now.day, selectedTime.hour, selectedTime.minute);
+                setState(() {
+                  time = selectedDateTime;
+                  // print("timeeseeeee3313 $time");
+                });
+              }
             },
             child: Container(
               margin: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -350,8 +359,8 @@ class _TaskViewState extends State<TaskView> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child:
-                        Text(MyString.timeString, style: textTheme.headline5),
+                    child: Text(MyString.timeString,
+                        style: textTheme.headlineMedium),
                   ),
                   Expanded(child: Container()),
                   Container(
@@ -364,7 +373,7 @@ class _TaskViewState extends State<TaskView> {
                     child: Center(
                       child: Text(
                         showTime(time),
-                        style: textTheme.subtitle2,
+                        style: textTheme.labelLarge,
                       ),
                     ),
                   )
@@ -375,12 +384,15 @@ class _TaskViewState extends State<TaskView> {
 
           /// Date Picker
           GestureDetector(
-            onTap: () {
-              DatePicker.showDatePicker(context,
-                  showTitleActions: true,
-                  minTime: DateTime.now(),
-                  maxTime: DateTime(2030, 3, 5),
-                  onChanged: (_) {}, onConfirm: (selectedDate) {
+            onTap: () async {
+              DateTime? selectedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2030, 3, 5),
+              );
+
+              if (selectedDate != null) {
                 setState(() {
                   if (widget.task?.createdAtDate == null) {
                     date = selectedDate;
@@ -388,8 +400,23 @@ class _TaskViewState extends State<TaskView> {
                     widget.task!.createdAtDate = selectedDate;
                   }
                 });
-                FocusManager.instance.primaryFocus?.unfocus();
-              }, currentTime: showDateAsDateTime(date));
+              }
+
+              FocusManager.instance.primaryFocus?.unfocus();
+              // datetime_picker.DatePicker.showDatePicker(context,
+              //     showTitleActions: true,
+              //     minTime: DateTime.now(),
+              //     maxTime: DateTime(2030, 3, 5),
+              //     onChanged: (_) {}, onConfirm: (selectedDate) {
+              //   setState(() {
+              //     if (widget.task?.createdAtDate == null) {
+              //       date = selectedDate;
+              //     } else {
+              //       widget.task!.createdAtDate = selectedDate;
+              //     }
+              //   });
+              //   FocusManager.instance.primaryFocus?.unfocus();
+              // }, currentTime: showDateAsDateTime(date));
             },
             child: Container(
               margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -404,8 +431,8 @@ class _TaskViewState extends State<TaskView> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child:
-                        Text(MyString.dateString, style: textTheme.headline5),
+                    child: Text(MyString.dateString,
+                        style: textTheme.headlineMedium),
                   ),
                   Expanded(child: Container()),
                   Container(
@@ -418,7 +445,7 @@ class _TaskViewState extends State<TaskView> {
                     child: Center(
                       child: Text(
                         showDate(date),
-                        style: textTheme.subtitle2,
+                        style: textTheme.labelLarge,
                       ),
                     ),
                   )
@@ -441,7 +468,7 @@ class _TaskViewState extends State<TaskView> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(
-            width: 70,
+            width: 100,
             child: Divider(
               thickness: 2,
             ),
@@ -451,7 +478,7 @@ class _TaskViewState extends State<TaskView> {
                 text: isTaskAlreadyExistBool()
                     ? MyString.addNewTask
                     : MyString.updateCurrentTask,
-                style: textTheme.headline6,
+                style: textTheme.bodyLarge,
                 children: const [
                   TextSpan(
                     text: MyString.taskStrnig,
@@ -462,7 +489,7 @@ class _TaskViewState extends State<TaskView> {
                 ]),
           ),
           const SizedBox(
-            width: 70,
+            width: 100,
             child: Divider(
               thickness: 2,
             ),
@@ -474,7 +501,7 @@ class _TaskViewState extends State<TaskView> {
 }
 
 /// AppBar
-class MyAppBar extends StatelessWidget with PreferredSizeWidget {
+class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar({
     Key? key,
   }) : super(key: key);
@@ -483,7 +510,7 @@ class MyAppBar extends StatelessWidget with PreferredSizeWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 150,
+      height: 50,
       child: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Row(
@@ -498,7 +525,7 @@ class MyAppBar extends StatelessWidget with PreferredSizeWidget {
                 },
                 child: const Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  size: 50,
+                  size: 24,
                 ),
               ),
             ),

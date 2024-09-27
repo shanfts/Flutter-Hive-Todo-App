@@ -1,15 +1,12 @@
-//? CodeWithFlexz on Instagram
-
-//* AmirBayat0 on Github
-//! Programming with Flexz on Youtube
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+// import 'package:flutter_hive_tdo/view/splashScreen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:quick_do/view/splashScreen.dart';
 
 ///
 import '../data/hive_data_store.dart';
 import '../models/task.dart';
-import '../view/home/home_view.dart';
 
 Future<void> main() async {
   /// Initial Hive DB
@@ -29,12 +26,20 @@ Future<void> main() async {
     } else {}
   });
 
+  /// Set the status bar color to white
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.white, // Set the status bar color to white
+    statusBarIconBrightness:
+        Brightness.dark, // Set the status bar icon color to dark
+  ));
+
   runApp(BaseWidget(child: const MyApp()));
 }
 
 class BaseWidget extends InheritedWidget {
   BaseWidget({Key? key, required this.child}) : super(key: key, child: child);
   final HiveDataStore dataStore = HiveDataStore();
+  @override
   final Widget child;
 
   static BaseWidget of(BuildContext context) {
@@ -59,48 +64,48 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Hive Todo App',
+      title: 'Quick Do',
       theme: ThemeData(
         textTheme: const TextTheme(
-          headline1: TextStyle(
+          displayLarge: TextStyle(
             color: Colors.black,
             fontSize: 45,
             fontWeight: FontWeight.bold,
           ),
-          subtitle1: TextStyle(
+          titleMedium: TextStyle(
             color: Colors.grey,
             fontSize: 16,
             fontWeight: FontWeight.w300,
           ),
-          headline2: TextStyle(
+          displayMedium: TextStyle(
             color: Colors.white,
             fontSize: 21,
           ),
-          headline3: TextStyle(
+          displaySmall: TextStyle(
             color: Color.fromARGB(255, 234, 234, 234),
             fontSize: 14,
             fontWeight: FontWeight.w400,
           ),
-          headline4: TextStyle(
+          headlineMedium: TextStyle(
             color: Colors.grey,
             fontSize: 17,
           ),
-          headline5: TextStyle(
+          headlineSmall: TextStyle(
             color: Colors.grey,
             fontSize: 16,
           ),
-          subtitle2: TextStyle(
+          titleSmall: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w500,
           ),
-          headline6: TextStyle(
+          titleLarge: TextStyle(
             fontSize: 40,
             color: Colors.black,
             fontWeight: FontWeight.w300,
           ),
         ),
       ),
-      home: const HomeView(),
+      home: const SplashScreen(),
     );
   }
 }

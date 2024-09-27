@@ -1,5 +1,5 @@
-import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 part 'task.g.dart';
 
@@ -37,7 +37,7 @@ class Task extends HiveObject {
   @HiveField(5)
   bool isCompleted;
 
-  /// create new Task 
+  /// create new Task
   factory Task.create({
     required String? title,
     required String? subtitle,

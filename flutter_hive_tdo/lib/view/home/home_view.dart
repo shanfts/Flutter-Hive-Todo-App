@@ -3,18 +3,18 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 
 ///
 import '../../main.dart';
 import '../../models/task.dart';
 import '../../utils/colors.dart';
 import '../../utils/constanst.dart';
+import '../../utils/strings.dart';
 import '../../view/home/widgets/task_widget.dart';
 import '../../view/tasks/task_view.dart';
-import '../../utils/strings.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -60,31 +60,33 @@ class _HomeViewState extends State<HomeView> {
           /// Sort Task List
           tasks.sort(((a, b) => a.createdAtDate.compareTo(b.createdAtDate)));
 
-          return Scaffold(
-            backgroundColor: Colors.white,
+          return SafeArea(
+            child: Scaffold(
+              backgroundColor: Colors.white,
 
-            /// Floating Action Button
-            floatingActionButton: const FAB(),
+              /// Floating Action Button
+              floatingActionButton: const FAB(),
 
-            /// Body
-            body: SliderDrawer(
-              isDraggable: false,
-              key: dKey,
-              animationDuration: 1000,
+              /// Body
+              body: SliderDrawer(
+                isDraggable: false,
+                key: dKey,
+                animationDuration: 1000,
 
-              /// My AppBar
-              appBar: MyAppBar(
-                drawerKey: dKey,
-              ),
+                /// My AppBar
+                appBar: MyAppBar(
+                  drawerKey: dKey,
+                ),
 
-              /// My Drawer Slider
-              slider: MySlider(),
+                /// My Drawer Slider
+                slider: MySlider(),
 
-              /// Main Body
-              child: _buildBody(
-                tasks,
-                base,
-                textTheme,
+                /// Main Body
+                child: _buildBody(
+                  tasks,
+                  base,
+                  textTheme,
+                ),
               ),
             ),
           );
@@ -100,121 +102,124 @@ class _HomeViewState extends State<HomeView> {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: Column(
-        children: [
-          /// Top Section Of Home page : Text, Progrss Indicator
-          Container(
-            margin: const EdgeInsets.fromLTRB(55, 0, 0, 0),
-            width: double.infinity,
-            height: 100,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                /// CircularProgressIndicator
-                SizedBox(
-                  width: 25,
-                  height: 25,
-                  child: CircularProgressIndicator(
-                    valueColor: const AlwaysStoppedAnimation(MyColors.primaryColor),
-                    backgroundColor: Colors.grey,
-                    value: checkDoneTask(tasks) / valueOfTheIndicator(tasks),
-                  ),
-                ),
-                const SizedBox(
-                  width: 25,
-                ),
-
-                /// Texts
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(MyString.mainTitle, style: textTheme.headline1),
-                    const SizedBox(
-                      height: 3,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            /// Top Section Of Home page : Text, Progrss Indicator
+            Container(
+              margin: const EdgeInsets.fromLTRB(55, 0, 0, 0),
+              width: double.infinity,
+              height: 50,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  /// CircularProgressIndicator
+                  SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          const AlwaysStoppedAnimation(MyColors.primaryColor),
+                      backgroundColor: Colors.grey,
+                      value: checkDoneTask(tasks) / valueOfTheIndicator(tasks),
                     ),
-                    Text("${checkDoneTask(tasks)} of ${tasks.length} task",
-                        style: textTheme.subtitle1),
-                  ],
-                )
-              ],
-            ),
-          ),
+                  ),
+                  const SizedBox(
+                    width: 25,
+                  ),
 
-          /// Divider
-          const Padding(
-            padding: EdgeInsets.only(top: 10),
-            child: Divider(
-              thickness: 2,
-              indent: 100,
-            ),
-          ),
-
-          /// Bottom ListView : Tasks
-          SizedBox(
-            width: double.infinity,
-            height: 585,
-            child: tasks.isNotEmpty
-                ? ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: tasks.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      var task = tasks[index];
-
-                      return Dismissible(
-                        direction: DismissDirection.horizontal,
-                        background: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              Icons.delete_outline,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Text(MyString.deletedTask,
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ))
-                          ],
-                        ),
-                        onDismissed: (direction) {
-                          base.dataStore.dalateTask(task: task);
-                        },
-                        key: Key(task.id),
-                        child: TaskWidget(
-                          task: tasks[index],
-                        ),
-                      );
-                    },
-                  )
-
-                /// if All Tasks Done Show this Widgets
-                : Column(
+                  /// Texts
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// Lottie
-                      FadeIn(
-                        child: SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: Lottie.asset(
-                            lottieURL,
-                            animate: tasks.isNotEmpty ? false : true,
+                      Text(MyString.mainTitle, style: textTheme.headlineSmall),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Text("${checkDoneTask(tasks)} of ${tasks.length} task",
+                          style: textTheme.bodySmall),
+                    ],
+                  )
+                ],
+              ),
+            ),
+
+            /// Divider
+            const Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Divider(
+                thickness: 2,
+                indent: 100,
+              ),
+            ),
+
+            /// Bottom ListView : Tasks
+            SizedBox(
+              width: double.infinity,
+              height: 585,
+              child: tasks.isNotEmpty
+                  ? ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: tasks.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var task = tasks[index];
+
+                        return Dismissible(
+                          direction: DismissDirection.horizontal,
+                          background: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(MyString.deletedTask,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  ))
+                            ],
+                          ),
+                          onDismissed: (direction) {
+                            base.dataStore.dalateTask(task: task);
+                          },
+                          key: Key(task.id),
+                          child: TaskWidget(
+                            task: tasks[index],
+                          ),
+                        );
+                      },
+                    )
+
+                  /// if All Tasks Done Show this Widgets
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        /// Lottie
+                        FadeIn(
+                          child: SizedBox(
+                            width: 200,
+                            height: 200,
+                            child: Lottie.asset(
+                              lottieURL,
+                              animate: tasks.isNotEmpty ? false : true,
+                            ),
                           ),
                         ),
-                      ),
 
-                      /// Bottom Texts
-                      FadeInUp(
-                        from: 30,
-                        child: const Text(MyString.doneAllTask),
-                      ),
-                    ],
-                  ),
-          )
-        ],
+                        /// Bottom Texts
+                        FadeInUp(
+                          from: 30,
+                          child: const Text(MyString.doneAllTask),
+                        ),
+                      ],
+                    ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -255,15 +260,15 @@ class MySlider extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage('assets/img/main.png'),
-          ),
+          // const CircleAvatar(
+          //   radius: 50,
+          //   backgroundImage: AssetImage('assets/img/main.png'),
+          // ),
           const SizedBox(
             height: 8,
           ),
-          Text("AmirHossein Bayat", style: textTheme.headline2),
-          Text("junior flutter dev", style: textTheme.headline3),
+          // Text("AmirHossein Bayat", style: textTheme.headlineMedium),
+          // Text("junior flutter dev", style: textTheme.headlineMedium),
           Container(
             margin: const EdgeInsets.symmetric(
               vertical: 30,
@@ -303,8 +308,9 @@ class MySlider extends StatelessWidget {
 }
 
 /// My App Bar
-class MyAppBar extends StatefulWidget with PreferredSizeWidget {
-  MyAppBar({Key? key, 
+class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
+  MyAppBar({
+    Key? key,
     required this.drawerKey,
   }) : super(key: key);
   GlobalKey<SliderDrawerState> drawerKey;
@@ -327,7 +333,7 @@ class _MyAppBarState extends State<MyAppBar>
 
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 500),
     );
   }
 
@@ -338,43 +344,39 @@ class _MyAppBarState extends State<MyAppBar>
   }
 
   /// toggle for drawer and icon aniamtion
-  void toggle() {
-    setState(() {
-      isDrawerOpen = !isDrawerOpen;
-      if (isDrawerOpen) {
-        controller.forward();
-        widget.drawerKey.currentState!.openSlider();
-      } else {
-        controller.reverse();
-        widget.drawerKey.currentState!.closeSlider();
-      }
-    });
-  }
+  // void toggle() {
+  //   setState(() {
+  //     isDrawerOpen = !isDrawerOpen;
+  //     if (isDrawerOpen) {
+  //       controller.forward();
+  //       widget.drawerKey.currentState!.openSlider();
+  //     } else {
+  //       controller.reverse();
+  //       widget.drawerKey.currentState!.closeSlider();
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     var base = BaseWidget.of(context).dataStore.box;
+    var textThemess = Theme.of(context).textTheme;
     return SizedBox(
       width: double.infinity,
-      height: 132,
+      height: 100,
       child: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /// Animated Icon - Menu & Close
+            // / Animated Icon - Menu & Close
             Padding(
               padding: const EdgeInsets.only(left: 20),
-              child: IconButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  icon: AnimatedIcon(
-                    icon: AnimatedIcons.menu_close,
-                    progress: controller,
-                    size: 40,
-                  ),
-                  onPressed: toggle),
+              child: Text(
+                'Quick Do',
+                style: textThemess.displayMedium!.copyWith(color: Colors.black),
+              ),
             ),
 
             /// Delete Icon
@@ -388,7 +390,7 @@ class _MyAppBarState extends State<MyAppBar>
                 },
                 child: const Icon(
                   CupertinoIcons.trash,
-                  size: 40,
+                  size: 24,
                 ),
               ),
             ),
